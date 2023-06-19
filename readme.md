@@ -1,63 +1,62 @@
-Pendulum Control System Using ROS2 and LQR
-This project is a demonstration of controlling an inverted pendulum using ROS2 and a Linear Quadratic Regulator (LQR). The pendulum system is simulated using a physics model and the control strategy is implemented using ROS2 nodes.
+# Pendulum Control with ROS2
 
-Project Structure
-The project is structured as follows:
+This project implements a pendulum control system using ROS2. The system simulates a pendulum and applies control techniques to maintain the pendulum at an upright position. 
 
-config/: Contains YAML configuration files for the simulator and the controller.
-src/: Contains the source code files for the simulator and the controller.
-The primary components of the project are the pendulum_simulator and pendulum_controller nodes. The pendulum_simulator simulates the physics of an inverted pendulum while the pendulum_controller node applies a control input to stabilize the pendulum using an LQR controller.
+## Setup and Installation
 
-Pendulum Dynamics
-The dynamics of the pendulum are derived from the Euler-Lagrange equation, which results in a second-order differential equation. This equation is then linearized around the unstable equilibrium point (the inverted position), and discretized for implementation in the simulator node.
+1. Install ROS2 Humble by following the instructions [here](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html).
 
-Control Strategy
-The controller is based on a Linear Quadratic Regulator (LQR), which is a control strategy used to stabilize linear systems. Given a model of the system, an LQR controller optimally determines the control inputs to minimize a cost function, typically the sum of the state and control input energy. The resulting LQR gain was computed offline and is used in the pendulum_controller node.
+2. Create a new ROS2 workspace or navigate to your existing workspace:
+```
+mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
+```
+3. Clone the pendulum control project into your workspace's `src` directory.
+4. Build the project using colcon:
+```
+cd ~/ros2_ws
+colcon build --packages-select pendulum_control
+```
+5. Source your ROS2 workspace:
+```
+source ~/ros2_ws/install/setup.bash
+```
+## Running the Project
 
-Installation and Setup
-The project is based on ROS2 Foxy. If you haven't already installed ROS2, follow the instructions on the official ROS2 documentation.
-
-To compile the project:
-
-Navigate to your ROS2 workspace's src directory.
-
-Clone the repository:
-
-bash
-Copy code
-git clone <repository_url>
-Navigate back to your ROS2 workspace's root directory.
-
-Compile the code:
-
-bash
-Copy code
-colcon build
-Source the workspace:
-
-bash
-Copy code
-source install/setup.bash
-Running the Project
-Before running the project, make sure you're in the project's root directory and have sourced the workspace.
-
-To run the project, use the following ROS2 commands:
-
-Start the pendulum simulator:
-
-bash
-Copy code
-ros2 run pendulum_control pendulum_simulator --ros-args --params-file pendulum_control/config/pendulum_parameters.yaml
-Start RViz2:
-
-bash
-Copy code
-rviz2
-Load the provided configuration file in RViz2 to view the pendulum system. This will allow you to visualize the pendulum's motion in real-time.
-
-Start the pendulum controller:
-
-bash
-Copy code
+First, start the pendulum controller:
+```
 ros2 run pendulum_control pendulum_controller --ros-args --params-file pendulum_control/config/pendulum_parameters.yaml
-This starts the controller which uses the LQR control strategy to regulate the pendulum's motion.
+```
+Then, in another terminal, start RViz2:
+```
+ros2 run rviz2 rviz2
+```
+Finally, in a third terminal, start the pendulum simulator:
+```
+ros2 run pendulum_control pendulum_simulator --ros-args --params-file pendulum_control/config/pendulum_parameters.yaml
+```
+
+## Project Structure
+
+The project structure is as follows:
+
+- `config`: This folder contains the YAML file for setting parameters like mass, gravity, length, integrator type, and control mode for the pendulum simulator, and the gain values for the controller.
+- `src`: This folder contains the source files for the pendulum simulator and controller nodes.
+
+## Pendulum Equations of Motion
+
+The motion of the pendulum is governed by the following second-order differential equation, derived from Newton's second law:
+
+theta'' = - (g/L) * sin(theta)
+
+where:
+- theta is the pendulum angle,
+- g is the acceleration due to gravity,
+- L is the length of the pendulum.
+
+## Controls
+
+The control system uses a Linear Quadratic Regulator (LQR) to keep the pendulum at an upright position. The controller calculates the torque needed to maintain this position based on the current angle and angular velocity of the pendulum.
+
+The LQR controller requires gain values (K_theta for angle and K_omega for angular velocity). These gains are chosen based on the dynamics of the pendulum system and the desired response characteristics. They can be tuned to make the controller more or less aggressive.
+
