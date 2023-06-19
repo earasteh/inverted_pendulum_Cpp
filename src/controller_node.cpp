@@ -46,7 +46,8 @@ private:
         RCLCPP_INFO(this->get_logger(), "omega (rad/sec) : '%f'", pendulum_state.angular_velocity);
         //control implementation
         //double output = 35.97 * (M_PI - pendulum_state.angle) - 32.74 * pendulum_state.angular_velocity;
-        double output = 90.6700 * (M_PI - pendulum_state.angle) - 34.3706 * pendulum_state.angular_velocity;
+        //double output = 90.6700 * (M_PI - pendulum_state.angle) - 34.3706 * pendulum_state.angular_velocity;
+        double output = 214.0119 * (M_PI - pendulum_state.angle) - 37.7892 * pendulum_state.angular_velocity;
 
         return output;
     }

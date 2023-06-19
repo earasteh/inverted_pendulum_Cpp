@@ -10,7 +10,8 @@
 #include "pendulum_control/msg/pendulum_state.hpp"
 #include "std_msgs/msg/string.hpp"
 
-#include <random> //for perturbations
+#include <random> //for std::random_device and std::mt19937
+#include <chrono> //for std::chrono::system_clock
 
 using namespace std::chrono_literals;
 
@@ -19,7 +20,10 @@ class PendulumSimulator : public rclcpp::Node
 public:
     PendulumSimulator() : Node("pendulum_simulator"), current_angle_(45*M_PI/180), current_angular_velocity_(0.0), torque(0.0)
     {
-        //launch_time_ = this->now();
+        // Initialize the random number generator with current time as seed
+        std::random_device rd;
+        generator.seed(rd());
+
         tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
         control_input_publisher_ = this->create_publisher<pendulum_control::msg::PendulumState>("control_input", 10);
         pendulum_viz_publisher_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("pendulum_viz", 10);
@@ -65,7 +69,6 @@ private:
     // This function calculates the next state (theta, omega) given the current state and the torque
     std::pair<double, double> pendulum_dynamics(double theta, double omega, double tau_, double dt) {
         // theta = angle of the pendulum, omega= angular velocity of the pendulum, tau_ = torque input of the motor
-        
         //if euler
         
         // Update theta and omega using Euler's method
@@ -123,6 +126,8 @@ private:
 
         tf_broadcaster_->sendTransform(transformStamped);
 
+        //perturbation
+        torque += generate_perturbation();
         // pendulum dynamics
         auto [next_angle, next_angular_velocity_] = pendulum_dynamics(current_angle_, current_angular_velocity_, torque, dt);
 
@@ -206,6 +211,13 @@ void control_output_callback(const geometry_msgs::msg::Wrench::SharedPtr msg)
     // Publish control input for the controller (pendulum states)
     control_input_publisher_->publish(control_input_msg);
 }
+
+double generate_perturbation() {
+    std::normal_distribution<double> distribution(5, 5); // 5 N.m mean
+    return distribution(generator);
+}
+
+    std::mt19937 generator;
 
     rclcpp::Publisher<pendulum_control::msg::PendulumState>::SharedPtr control_input_publisher_;
     rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr pendulum_viz_publisher_;
