@@ -4,7 +4,7 @@ pendulum_simulator:
         g: 9.81
         L: 1.0
         integrator: "RK4"
-        sim_mode: "perturb"
+        sim_mode: "free-fall"
 pendulum_controller:
     ros__parameters:
         K_theta: 697.3648

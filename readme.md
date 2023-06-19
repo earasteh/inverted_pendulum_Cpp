@@ -12,20 +12,24 @@ mkdir -p ~/ros2_ws/src
 cd ~/ros2_ws/src
 ```
 3. Clone the pendulum control project into your workspace's `src` directory.
-4. Build the project using colcon:
-```
-cd ~/ros2_ws
-colcon build --packages-select pendulum_control
-```
-5. Source your ROS2 workspace:
+
+4. Source your ROS2 workspace:
 ```
 source ~/ros2_ws/install/setup.bash
 ```
+5. Build the project using colcon:
+```
+cd ~/ros2_ws
+colcon build --packages-select pendulum_control
+
 ## Running the Project
+
+Notes:
+Make sure in every new terminal source the ROS2 workspace before running these commands. Also make sure there is no virtual environment running on the terminal  (if so, deactivate it first).
 
 First, start the pendulum controller:
 ```
-ros2 run pendulum_control pendulum_controller --ros-args --params-file pendulum_control/config/pendulum_parameters.yaml
+ros2 run pendulum_control controller_node --ros-args --params-file pendulum_control/config/pendulum_parameters.yaml
 ```
 Then, in another terminal, start RViz2:
 ```
@@ -42,6 +46,8 @@ The project structure is as follows:
 
 - `config`: This folder contains the YAML file for setting parameters like mass, gravity, length, integrator type, and control mode for the pendulum simulator, and the gain values for the controller.
 - `src`: This folder contains the source files for the pendulum simulator and controller nodes.
+- `msg`: This folder contains custom message `PendulumState.msg` which is used to communicate between the simulator and the controller
+- `include`: This folder includes all the header-only libraries (empty)!
 
 ## Configuration
 
@@ -91,21 +97,24 @@ These parameters are loaded at startup from the specified YAML file using the `-
 The equations of motion for a simple pendulum under the influence of gravity are derived from Newton's second law of motion. The system consists of a mass (m) connected to a fixed pivot point by a rod of length (L). The pendulum can swing in a plane under the influence of gravity (g).
 The angle that the pendulum makes with the vertical direction is denoted as θ. Positive θ corresponds to counterclockwise rotation from the vertical. We assume that the pendulum rod is massless and that all the mass is concentrated at the end of the rod.
 The equation of motion is:
-
 ```math
+\begin{aligned}
+\tau = I \alpha\\
+- m \cdot g \cdot sin(\theta) L = m L^2 \frac{d\theta^2}{t^2} \\
 \frac{d\theta^2}{t^2} = -\frac{g}{L} \cdot sin(\theta)
+\end{aligned}
 ```
 This second order differential equation is nonlinear due to the sine function. However, for small angles, sin(θ) can be approximated to θ, simplifying the equation to:
 ```math
 \frac{d^2\theta}{t^2} = -\frac{g}{L} \cdot \theta
 ```
 This is a simple harmonic motion equation.
-The pendulum's angular velocity ($\omega = \frac{\theta}{t}$) and angular acceleration (\alpha = \frac{d^2\theta}{t^2}) can be updated over time using numerical integration methods such as Euler's method or the 4th order Runge-Kutta method, depending on the `integrator` parameter.
+The pendulum's angular velocity ($\omega = \frac{\theta}{t}$) and angular acceleration ($\alpha = \frac{d^2\theta}{t^2}$) can be updated over time using numerical integration methods such as Euler's method or the 4th order Runge-Kutta method, depending on the `integrator` parameter.
 
 When the pendulum is being controlled, an additional torque term can be introduced to the equation of motion to simulate a controlled pendulum. The controlled equation of motion is:
 
 ```math
-\frac{d\theta^2}{t^2} = - -\frac{g}{L} \cdot sin(\theta) + \frac{\tau}{m \cdot L^2}
+\frac{d\theta^2}{t^2} = - \frac{g}{L} \cdot sin(\theta) + \frac{\tau}{m \cdot L^2}
 ```
 
 where $\tau$ is the control torque applied at the pivot point.
