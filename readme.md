@@ -43,6 +43,50 @@ The project structure is as follows:
 - `config`: This folder contains the YAML file for setting parameters like mass, gravity, length, integrator type, and control mode for the pendulum simulator, and the gain values for the controller.
 - `src`: This folder contains the source files for the pendulum simulator and controller nodes.
 
+## Configuration
+
+The configuration of the pendulum simulator and controller is done through a YAML file. This provides an easy way to tune parameters without changing the source code.
+
+### Pendulum Simulator Configuration
+
+The pendulum simulator's configuration includes parameters such as mass (`m`), gravity (`g`), length (`L`), integrator type (`integrator`), and simulation mode (`sim_mode`).
+
+- `m`: The mass of the pendulum.
+- `g`: The acceleration due to gravity.
+- `L`: The length of the pendulum.
+- `integrator`: The type of numerical integration to use for the simulation. Choices are "Euler" for Euler's method, or "RK4" for the 4th order Runge-Kutta method.
+- `sim_mode`: The simulation mode. "free-fall" for uncontrolled simulation where the pendulum is free to swing, "controlled" where the pendulum controller is active and "perturb" where there is active control but perturbation is added to torque input.
+
+Example configuration:
+
+```yaml
+pendulum_simulator:
+    ros__parameters:
+        m: 1.0
+        g: 9.81
+        L: 1.0
+        integrator: "RK4"
+        sim_mode: "controlled"
+```
+
+### Pendulum Controller Configuration
+
+The pendulum controller's configuration includes parameters such as `K_theta` and `K_omega`, which are the gain values for the LQR controller.
+
+- `K_theta`: The gain for the pendulum angle error.
+- `K_omega`: The gain for the angular velocity error.
+
+Example configuration:
+
+```yaml
+pendulum_controller:
+    ros__parameters:
+        K_theta: 30.0
+        K_omega: 30.0
+```
+
+These parameters are loaded at startup from the specified YAML file using the `--params-file` argument. They can be adjusted as needed to change the behavior of the pendulum simulator and controller.
+
 ## Pendulum Equations of Motion
 
 The motion of the pendulum is governed by the following second-order differential equation, derived from Newton's second law:
