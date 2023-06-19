@@ -146,12 +146,14 @@ $K_{\theta}$ = 697.3648
 $K_{\omega}$ = 48.9360
 integrator: RK4
 controller output time period: 10ms
+### Free-fall case (No controller):
+[free-fall.webm](https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/59e4bd36-78b0-4260-87ed-9f90c7f1c797)
 
-# Controlled case:
+### Controlled case:
 
 https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/728afa6e-0006-4f37-a584-eb8e55c9ee53
 
-# Purterbed case:
+### Purterbed case:
 
 [perturb.webm](https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/728610c8-6ef5-4bb3-9d98-f256c231cb95)
 
