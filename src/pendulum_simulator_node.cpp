@@ -37,7 +37,7 @@ public:
         std::random_device rd;
         generator.seed(rd());
 
-        tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
+        tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this); //tf coordinates object
         control_input_publisher_ = this->create_publisher<pendulum_control::msg::PendulumState>("control_input", 10);
         pendulum_viz_publisher_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("pendulum_viz", 10);
 
@@ -48,40 +48,16 @@ public:
         );
 
         start_time_ = this->now(); // initialization time
-        last_time_ = this->get_clock()->now();
-        // Create a timer which fires every 1ms
+        last_time_ = this->get_clock()->now(); //last time the simulation (simulation_spinner) was ran
+        // Create a timer which fires every 1ms for the simulation dt
         timer_ = this->create_wall_timer(1ms, std::bind(&PendulumSimulator::simulation_spinner, this));
     }
 
 private:
-    // Pendulum parameters
-    double g;  // Gravity constant
-    double L;   // Pendulum length
-    double m;   // Pendulum mass
-
-    // // TF broadcaster function
-    // void transformStamp_broadcaster(){
-    // // tf broadcasting
-    //     geometry_msgs::msg::TransformStamped transformStamped;
-    //     transformStamped.header.stamp = this->now();
-    //     transformStamped.header.frame_id = "world";
-    //     transformStamped.child_frame_id = "base_link";
-    //     transformStamped.transform.translation.x = 0.0;
-    //     transformStamped.transform.translation.y = 0.0;
-    //     transformStamped.transform.translation.z = 0.0;
-    //     tf2::Quaternion q;
-    //     q.setRPY(0, 0, 0);
-    //     transformStamped.transform.rotation.x = q.x();
-    //     transformStamped.transform.rotation.y = q.y();
-    //     transformStamped.transform.rotation.z = q.z();
-    //     transformStamped.transform.rotation.w = q.w();
-
-    //     tf_broadcaster_->sendTransform(transformStamped);
-    // }
-
     // This function calculates the next state (theta, omega) given the current state and the torque
     std::pair<double, double> pendulum_dynamics(double theta, double omega, double tau_, double dt) {
-        // theta = angle of the pendulum, omega= angular velocity of the pendulum, tau_ = torque input of the motor
+        // theta = angle of the pendulum, omega= angular velocity of the pendulum, tau_ = torque input of the motor, dt = time constant
+
         double theta_next = 0, omega_next = 0;
         if(integrator_type == "Euler"){
             // Update theta and omega using Euler's method
@@ -116,6 +92,7 @@ private:
     }
 
     void simulation_spinner() {
+        // This method is the main simulation function. It contains the pendulum physics and the broadcast to RVIZ and PendulumState message
         // This method gets called every 1ms, regardless of when messages are received on the control_output topic.
         
         // calculate dt
@@ -124,7 +101,7 @@ private:
         last_time_ = current_time;
         
         
-        // tf broadcaster
+        // tf broadcaster (just broadcast a basic coordiantes)
         geometry_msgs::msg::TransformStamped transformStamped;
         transformStamped.header.stamp = this->now();
         transformStamped.header.frame_id = "world";
@@ -141,12 +118,13 @@ private:
 
         tf_broadcaster_->sendTransform(transformStamped);
 
+        // the torque is being chosen based on the simulation
         if(sim_mode == "free-fall"){
-            // ignore the controller
+            // ignore the controller's output
             torque = 0;
         }
         else if(sim_mode == "perturb"){
-            //perturbation
+            //perturbation being added to the controlled torque
             torque += generate_perturbation();
         }
         else{
@@ -219,17 +197,21 @@ private:
 void control_output_callback(const geometry_msgs::msg::Wrench::SharedPtr msg)
 {
     // This method gets called whenever a new message arrives on the control_output topic.
+    // it updates the torque values based on the subscribed geometery wrench message from the control node
+    // and then also publishes the current theta and omega of the pendulum to the PendulumState message
 
+    // just to keep track of the dt of controller being published
     rclcpp::Time now = this->now();
     double t_ = (now - start_time_).seconds();
     /////////
     std::cout << "Callback Timer: " << t_ << std::endl;
 
-    // update motor torque based on the received values from the controller node
+    
     if(sim_mode != "free-fall"){
+        // update motor torque based on the received values from the controller node
         torque = msg->torque.z;
     }
-    else{ // free-fall
+    else{ // free-fall , do not update the torque values
         torque = 0;
     }
 
@@ -244,23 +226,29 @@ void control_output_callback(const geometry_msgs::msg::Wrench::SharedPtr msg)
 }
 
 double generate_perturbation() {
-    std::normal_distribution<double> distribution(5, 5); // 5 N.m mean
+    // generate a normal distribution perturbation for the torque
+    std::normal_distribution<double> distribution(5, 5); // 5 N.m mean, +-5 N.m deviation
     return distribution(generator);
 }
-
+    // Pendulum parameters (filled with the yaml file)
+    double g;  // Gravity constant
+    double L;   // Pendulum length
+    double m;   // Pendulum mass
+    // modes (filled with the yaml file)
     std::string sim_mode;
     std::string integrator_type;
-
+    // random number generator for the perturbation
     std::mt19937 generator;
-
+    // sub/publisher objects
     rclcpp::Publisher<pendulum_control::msg::PendulumState>::SharedPtr control_input_publisher_;
     rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr pendulum_viz_publisher_;
     rclcpp::Subscription<geometry_msgs::msg::Wrench>::SharedPtr control_output_subscription_;
-
-    std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_; // tf object
-    
+    // tf object
+    std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_; 
+    // timers
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Time start_time_, last_time_; //start_time_ is beginning of simulation, last_time_ is last timestamp that the simulation_spinner() ran
+    // members to keep track of the pendulum state and the current torque received from the controller
     double current_angle_;
     double current_angular_velocity_;
     double torque;
