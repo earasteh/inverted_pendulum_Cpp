@@ -28,9 +28,10 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 add_executable(pendulum_simulator src/pendulum_simulator_node.cpp)
 rosidl_target_interfaces(pendulum_simulator ${PROJECT_NAME} "rosidl_typesupport_cpp")
 add_executable(controller_node src/controller_node.cpp)
-ament_target_dependencies(controller_node rclcpp geometry_msgs)
+rosidl_target_interfaces(controller_node ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 # Declare dependencies on the packages that node depend on
+ament_target_dependencies(controller_node rclcpp geometry_msgs)
 ament_target_dependencies(pendulum_simulator rclcpp geometry_msgs visualization_msgs tf2_ros)
 
 # Install executables

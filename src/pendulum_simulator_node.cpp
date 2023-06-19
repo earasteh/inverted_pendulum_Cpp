@@ -7,8 +7,10 @@
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/wrench.hpp"
 #include "visualization_msgs/msg/marker_array.hpp"
-#include "pendulum_control/msg/pendulum_state.hpp"  // Assume you have created this custom message
+#include "pendulum_control/msg/pendulum_state.hpp"
 #include "std_msgs/msg/string.hpp"
+
+#include <random> //for perturbations
 
 using namespace std::chrono_literals;
 
@@ -29,6 +31,7 @@ public:
         );
 
         start_time_ = this->now(); // initialization time
+        last_time_ = this->get_clock()->now();
         // Create a timer which fires every 1ms
         timer_ = this->create_wall_timer(1ms, std::bind(&PendulumSimulator::simulation_spinner, this));
     }
@@ -40,7 +43,7 @@ private:
     const double m = 1.0;   // Pendulum mass
 
     // Time parameters
-    const double dt = 0.001; // Time step
+    //const double dt = 0.001; // Time step
 
     // // TF broadcaster function
     // void transformStamp_broadcaster(){
@@ -63,7 +66,7 @@ private:
     // }
 
     // This function calculates the next state (theta, omega) given the current state and the torque
-    std::pair<double, double> pendulum_dynamics(double theta, double omega, double tau_) {
+    std::pair<double, double> pendulum_dynamics(double theta, double omega, double tau_, double dt) {
         // theta = angle of the pendulum, omega= angular velocity of the pendulum, tau_ = torque input of the motor
 
         // Update theta and omega using Euler's method
@@ -75,8 +78,13 @@ private:
 
     void simulation_spinner() {
         // This method gets called every 1ms, regardless of when messages are received on the control_output topic.
-        rclcpp::Time now = this->now();
-        double elapsed_time = (now - start_time_).seconds();
+        
+        // calculate dt
+        auto current_time = this->get_clock()->now();
+        auto dt = (current_time - last_time_).seconds(); // actual time since last call in seconds
+        last_time_ = current_time;
+        
+        
         // tf broadcaster
         geometry_msgs::msg::TransformStamped transformStamped;
         transformStamped.header.stamp = this->now();
@@ -95,7 +103,7 @@ private:
         tf_broadcaster_->sendTransform(transformStamped);
 
         // pendulum dynamics
-        auto [next_angle, next_angular_velocity_] = pendulum_dynamics(current_angle_, current_angular_velocity_, torque);
+        auto [next_angle, next_angular_velocity_] = pendulum_dynamics(current_angle_, current_angular_velocity_, torque, dt);
 
         current_angle_ = next_angle;
         current_angular_velocity_ = next_angular_velocity_;
@@ -185,7 +193,7 @@ void control_output_callback(const geometry_msgs::msg::Wrench::SharedPtr msg)
     std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_; // tf object
     
     rclcpp::TimerBase::SharedPtr timer_;
-    rclcpp::Time start_time_;
+    rclcpp::Time start_time_, last_time_; //start_time_ is beginning of simulation, last_time_ is last timestamp that the simulation_spinner() ran
     double current_angle_;
     double current_angular_velocity_;
     double torque;
