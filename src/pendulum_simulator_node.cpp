@@ -20,6 +20,19 @@ class PendulumSimulator : public rclcpp::Node
 public:
     PendulumSimulator() : Node("pendulum_simulator"), current_angle_(45*M_PI/180), current_angular_velocity_(0.0), torque(0.0)
     {
+        //parameters:
+        this->declare_parameter<double>("m", 1.0);
+        this->declare_parameter<double>("g", 9.81);
+        this->declare_parameter<double>("L", 1.0);
+        this->declare_parameter<std::string>("integrator", "Euler");
+        this->declare_parameter<std::string>("sim_mode", "free-fall");
+        
+        m = this->get_parameter("m").as_double();
+        g = this->get_parameter("g").as_double();
+        L = this->get_parameter("L").as_double();
+        sim_mode = this->get_parameter("sim_mode").as_string();
+        integrator_type = this->get_parameter("integrator").as_string();
+
         // Initialize the random number generator with current time as seed
         std::random_device rd;
         generator.seed(rd());
@@ -42,9 +55,9 @@ public:
 
 private:
     // Pendulum parameters
-    static constexpr double g = 9.81;  // Gravity constant
-    static constexpr double L = 1.0;   // Pendulum length
-    static constexpr double m = 1.0;   // Pendulum mass
+    double g;  // Gravity constant
+    double L;   // Pendulum length
+    double m;   // Pendulum mass
 
     // // TF broadcaster function
     // void transformStamp_broadcaster(){
@@ -76,8 +89,8 @@ private:
         // double omega_next = omega + dt * (-g/L * sin(theta) + tau_/m*pow(L,2));
         
         //if RK4:
-        auto f_omega = [tau_](double theta) {
-        return -PendulumSimulator::g/PendulumSimulator::L * sin(theta) + tau_/PendulumSimulator::m*pow(PendulumSimulator::L,2);
+        auto f_omega = [this, tau_](double theta) {
+        return - this->g/this->L * sin(theta) + tau_/this->m*pow(this->L,2);
         };
         auto f_theta = [](double omega) {
             return omega;
@@ -216,6 +229,9 @@ double generate_perturbation() {
     std::normal_distribution<double> distribution(5, 5); // 5 N.m mean
     return distribution(generator);
 }
+
+    std::string sim_mode;
+    std::string integrator_type;
 
     std::mt19937 generator;
 

@@ -1,0 +1,11 @@
+pendulum_simulator:
+    ros__parameters:
+        m: 1.0
+        g: 9.81
+        L: 1.0
+        integrator: "RK4"
+        sim_mode: "perturb"
+pendulum_controller:
+    ros__parameters:
+        K_theta: 1.0
+        K_omega: 1.0
