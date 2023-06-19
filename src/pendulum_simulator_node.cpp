@@ -38,12 +38,9 @@ public:
 
 private:
     // Pendulum parameters
-    const double g = 9.81;  // Gravity constant
-    const double L = 1.0;   // Pendulum length
-    const double m = 1.0;   // Pendulum mass
-
-    // Time parameters
-    //const double dt = 0.001; // Time step
+    static constexpr double g = 9.81;  // Gravity constant
+    static constexpr double L = 1.0;   // Pendulum length
+    static constexpr double m = 1.0;   // Pendulum mass
 
     // // TF broadcaster function
     // void transformStamp_broadcaster(){
@@ -68,10 +65,34 @@ private:
     // This function calculates the next state (theta, omega) given the current state and the torque
     std::pair<double, double> pendulum_dynamics(double theta, double omega, double tau_, double dt) {
         // theta = angle of the pendulum, omega= angular velocity of the pendulum, tau_ = torque input of the motor
-
+        
+        //if euler
+        
         // Update theta and omega using Euler's method
-        double theta_next = theta + dt * omega;
-        double omega_next = omega + dt * (-g/L * sin(theta) + tau_/m*pow(L,2));
+        // double theta_next = theta + dt * omega;
+        // double omega_next = omega + dt * (-g/L * sin(theta) + tau_/m*pow(L,2));
+        
+        //if RK4:
+        auto f_omega = [tau_](double theta) {
+        return -PendulumSimulator::g/PendulumSimulator::L * sin(theta) + tau_/PendulumSimulator::m*pow(PendulumSimulator::L,2);
+        };
+        auto f_theta = [](double omega) {
+            return omega;
+        };
+
+        // RK4 for theta
+        double k1_theta = dt * f_theta(omega);
+        double k2_theta = dt * f_theta(omega + k1_theta / 2.0);
+        double k3_theta = dt * f_theta(omega + k2_theta / 2.0);
+        double k4_theta = dt * f_theta(omega + k3_theta);
+        double theta_next = theta + (k1_theta + 2 * k2_theta + 2 * k3_theta + k4_theta) / 6.0;
+
+        // RK4 for omega
+        double k1_omega = dt * f_omega(theta);
+        double k2_omega = dt * f_omega(theta + k1_theta / 2.0);
+        double k3_omega = dt * f_omega(theta + k2_theta / 2.0);
+        double k4_omega = dt * f_omega(theta + k3_theta);
+        double omega_next = omega + (k1_omega + 2 * k2_omega + 2 * k3_omega + k4_omega) / 6.0;
 
         return {theta_next, omega_next};
     }
