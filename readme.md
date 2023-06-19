@@ -142,11 +142,16 @@ There are several numerical methods to solve the ARE, such as the Schur method, 
 It's important to note that the ARE only has a unique positive semi-definite solution if certain conditions on the matrices $A$, $B$, $Q$, and $R$ are met, such as $A$ being stable, $Q$ being positive semi-definite, and $R$ being positive definite. These conditions ensure that the optimal control problem posed by the LQR formulation is well-posed and has a solution.
 
 ## Results
-
-# Purterbed case:
 $K_{\theta}$ = 697.3648
 $K_{\omega}$ = 48.9360
 integrator: RK4
+controller output time period: 10ms
+
+# Controlled case:
+
+https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/728afa6e-0006-4f37-a584-eb8e55c9ee53
+
+# Purterbed case:
 
 [perturb.webm](https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/728610c8-6ef5-4bb3-9d98-f256c231cb95)
 
