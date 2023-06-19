@@ -15,7 +15,7 @@ using namespace std::chrono_literals;
 class PendulumSimulator : public rclcpp::Node
 {
 public:
-    PendulumSimulator() : Node("pendulum_simulator"), current_angle_(45*M_PI/180), current_angular_velocity_(0)
+    PendulumSimulator() : Node("pendulum_simulator"), current_angle_(45*M_PI/180), current_angular_velocity_(0.0), torque(0.0)
     {
         //launch_time_ = this->now();
         tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
@@ -30,7 +30,7 @@ public:
 
         start_time_ = this->now(); // initialization time
         // Create a timer which fires every 1ms
-        timer_ = this->create_wall_timer(1ms, std::bind(&PendulumSimulator::simulation_dynamics, this));
+        timer_ = this->create_wall_timer(1ms, std::bind(&PendulumSimulator::simulation_spinner, this));
     }
 
 private:
@@ -73,7 +73,7 @@ private:
         return {theta_next, omega_next};
     }
 
-    void simulation_dynamics() {
+    void simulation_spinner() {
         // This method gets called every 1ms, regardless of when messages are received on the control_output topic.
         rclcpp::Time now = this->now();
         double elapsed_time = (now - start_time_).seconds();
@@ -94,13 +94,8 @@ private:
 
         tf_broadcaster_->sendTransform(transformStamped);
 
-        // auto msg = std::make_shared<geometry_msgs::msg::Wrench>();        
-        // msg->torque.z = 0.0;
-        // control_output_callback(msg);
-        // RCLCPP_INFO(this->get_logger(), "Receving: '%f'", msg->torque.z);
-
         // pendulum dynamics
-        auto [next_angle, next_angular_velocity_] = pendulum_dynamics(current_angle_, current_angular_velocity_, msg->torque.z);
+        auto [next_angle, next_angular_velocity_] = pendulum_dynamics(current_angle_, current_angular_velocity_, torque);
 
         current_angle_ = next_angle;
         current_angular_velocity_ = next_angular_velocity_;
@@ -170,16 +165,16 @@ void control_output_callback(const geometry_msgs::msg::Wrench::SharedPtr msg)
     double t_ = (now - start_time_).seconds();
     /////////
     std::cout << "Callback Timer: " << t_ << std::endl;
-    // Update pendulum state based on received wrench
-    // Here, for simplicity, let's just assume the torque in the z-direction directly maps to the angle of the pendulum
-    // In a realistic scenario, you would use more complex physics involving moment of inertia, gravitational force etc.
 
+    // update motor torque based on the received values from the controller node
+    torque = msg->torque.z;
+    
     // Create control input message with the new state
     pendulum_control::msg::PendulumState control_input_msg;
     control_input_msg.angle = current_angle_;
     control_input_msg.angular_velocity = current_angular_velocity_;
 
-    // Publish control input for the controller
+    // Publish control input for the controller (pendulum states)
     control_input_publisher_->publish(control_input_msg);
 }
 
@@ -193,6 +188,7 @@ void control_output_callback(const geometry_msgs::msg::Wrench::SharedPtr msg)
     rclcpp::Time start_time_;
     double current_angle_;
     double current_angular_velocity_;
+    double torque;
 };
 
 int main(int argc, char ** argv)

@@ -22,7 +22,7 @@ private:
     message.force.z = 0.0;
     message.torque.x = 0.0;
     message.torque.y = 0.0;
-    message.torque.z = 100.0;
+    message.torque.z = 15.0;
 
     RCLCPP_INFO(this->get_logger(), "Publishing: '%f'", message.torque.z);
     publisher_->publish(message);
