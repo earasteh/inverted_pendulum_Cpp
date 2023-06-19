@@ -10,7 +10,6 @@ class PendulumController : public rclcpp::Node
 public:
     PendulumController() : Node("pendulum_controller")
     {
-
         //parameters:
         this->declare_parameter<double>("K_theta", 30.0);
         this->declare_parameter<double>("K_omega", 30.0);
