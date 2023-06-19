@@ -7,5 +7,5 @@ pendulum_simulator:
         sim_mode: "perturb"
 pendulum_controller:
     ros__parameters:
-        K_theta: 1.0
-        K_omega: 1.0
+        K_theta: 214.0119
+        K_omega: 37.7892

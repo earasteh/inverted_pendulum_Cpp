@@ -82,33 +82,35 @@ private:
     // This function calculates the next state (theta, omega) given the current state and the torque
     std::pair<double, double> pendulum_dynamics(double theta, double omega, double tau_, double dt) {
         // theta = angle of the pendulum, omega= angular velocity of the pendulum, tau_ = torque input of the motor
-        //if euler
-        
-        // Update theta and omega using Euler's method
-        // double theta_next = theta + dt * omega;
-        // double omega_next = omega + dt * (-g/L * sin(theta) + tau_/m*pow(L,2));
-        
-        //if RK4:
-        auto f_omega = [this, tau_](double theta) {
-        return - this->g/this->L * sin(theta) + tau_/this->m*pow(this->L,2);
-        };
-        auto f_theta = [](double omega) {
-            return omega;
-        };
+        double theta_next = 0, omega_next = 0;
+        if(integrator_type == "Euler"){
+            // Update theta and omega using Euler's method
+            theta_next = theta + dt * omega;
+            omega_next = omega + dt * (-g/L * sin(theta) + tau_/m*pow(L,2));
+        }
+        else if (integrator_type == "RK4"){ 
+            //Update theta and omega using Runge-Kutta 4-th order
+            auto f_omega = [this, tau_](double theta) {
+            return - this->g/this->L * sin(theta) + tau_/this->m*pow(this->L,2);
+            };
+            auto f_theta = [](double omega) {
+                return omega;
+            };
 
-        // RK4 for theta
-        double k1_theta = dt * f_theta(omega);
-        double k2_theta = dt * f_theta(omega + k1_theta / 2.0);
-        double k3_theta = dt * f_theta(omega + k2_theta / 2.0);
-        double k4_theta = dt * f_theta(omega + k3_theta);
-        double theta_next = theta + (k1_theta + 2 * k2_theta + 2 * k3_theta + k4_theta) / 6.0;
+            // RK4 for theta
+            double k1_theta = dt * f_theta(omega);
+            double k2_theta = dt * f_theta(omega + k1_theta / 2.0);
+            double k3_theta = dt * f_theta(omega + k2_theta / 2.0);
+            double k4_theta = dt * f_theta(omega + k3_theta);
+            theta_next = theta + (k1_theta + 2 * k2_theta + 2 * k3_theta + k4_theta) / 6.0;
 
-        // RK4 for omega
-        double k1_omega = dt * f_omega(theta);
-        double k2_omega = dt * f_omega(theta + k1_theta / 2.0);
-        double k3_omega = dt * f_omega(theta + k2_theta / 2.0);
-        double k4_omega = dt * f_omega(theta + k3_theta);
-        double omega_next = omega + (k1_omega + 2 * k2_omega + 2 * k3_omega + k4_omega) / 6.0;
+            // RK4 for omega
+            double k1_omega = dt * f_omega(theta);
+            double k2_omega = dt * f_omega(theta + k1_theta / 2.0);
+            double k3_omega = dt * f_omega(theta + k2_theta / 2.0);
+            double k4_omega = dt * f_omega(theta + k3_theta);
+            omega_next = omega + (k1_omega + 2 * k2_omega + 2 * k3_omega + k4_omega) / 6.0;
+        }
 
         return {theta_next, omega_next};
     }
@@ -139,8 +141,18 @@ private:
 
         tf_broadcaster_->sendTransform(transformStamped);
 
-        //perturbation
-        torque += generate_perturbation();
+        if(sim_mode == "free-fall"){
+            // ignore the controller
+            torque = 0;
+        }
+        else if(sim_mode == "perturb"){
+            //perturbation
+            torque += generate_perturbation();
+        }
+        else{
+            // controlled torque
+        }
+
         // pendulum dynamics
         auto [next_angle, next_angular_velocity_] = pendulum_dynamics(current_angle_, current_angular_velocity_, torque, dt);
 
@@ -214,7 +226,13 @@ void control_output_callback(const geometry_msgs::msg::Wrench::SharedPtr msg)
     std::cout << "Callback Timer: " << t_ << std::endl;
 
     // update motor torque based on the received values from the controller node
-    torque = msg->torque.z;
+    if(sim_mode != "free-fall"){
+        torque = msg->torque.z;
+    }
+    else{ // free-fall
+        torque = 0;
+    }
+
     
     // Create control input message with the new state
     pendulum_control::msg::PendulumState control_input_msg;

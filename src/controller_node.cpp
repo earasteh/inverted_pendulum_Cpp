@@ -10,6 +10,13 @@ class PendulumController : public rclcpp::Node
 public:
     PendulumController() : Node("pendulum_controller")
     {
+
+        //parameters:
+        this->declare_parameter<double>("K_theta", 30.0);
+        this->declare_parameter<double>("K_omega", 30.0);
+        K_theta = this->get_parameter("K_theta").as_double();
+        K_omega = this->get_parameter("K_omega").as_double();
+
         publisher_ = this->create_publisher<geometry_msgs::msg::Wrench>("control_output", 10);
         subscription_ = this->create_subscription<pendulum_control::msg::PendulumState>(
             "control_input", 10, std::bind(&PendulumController::pendulum_callback, this, std::placeholders::_1));
@@ -47,7 +54,7 @@ private:
         //control implementation
         //double output = 35.97 * (M_PI - pendulum_state.angle) - 32.74 * pendulum_state.angular_velocity;
         //double output = 90.6700 * (M_PI - pendulum_state.angle) - 34.3706 * pendulum_state.angular_velocity;
-        double output = 214.0119 * (M_PI - pendulum_state.angle) - 37.7892 * pendulum_state.angular_velocity;
+        double output = K_theta * (M_PI - pendulum_state.angle) - K_omega * pendulum_state.angular_velocity;
 
         return output;
     }
@@ -55,7 +62,7 @@ private:
     rclcpp::Publisher<geometry_msgs::msg::Wrench>::SharedPtr publisher_;
     rclcpp::Subscription<pendulum_control::msg::PendulumState>::SharedPtr subscription_;
     rclcpp::TimerBase::SharedPtr timer_;
-    double torque_;
+    double torque_, K_theta, K_omega;
 };
 
 int main(int argc, char *argv[])
