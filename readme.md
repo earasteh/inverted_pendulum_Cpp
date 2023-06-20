@@ -21,6 +21,7 @@ source ~/ros2_ws/install/setup.bash
 ```
 cd ~/ros2_ws
 colcon build --packages-select pendulum_control
+```
 
 ## Running the Project
 
@@ -52,6 +53,10 @@ The project structure is as follows:
 ## Configuration
 
 The configuration of the pendulum simulator and controller is done through a YAML file. This provides an easy way to tune parameters without changing the source code.
+
+### Node and topics graphs
+
+![Nodes and topics graph](results/rosgraph.png)
 
 ### Pendulum Simulator Configuration
 
@@ -98,12 +103,11 @@ The equations of motion for a simple pendulum under the influence of gravity are
 The angle that the pendulum makes with the vertical direction is denoted as θ. Positive θ corresponds to counterclockwise rotation from the vertical. We assume that the pendulum rod is massless and that all the mass is concentrated at the end of the rod.
 The equation of motion is:
 ```math
-\begin{aligned}
-\centering
+\begin{laligned}
 \tau = I \alpha\\
 - m \cdot g \cdot sin(\theta) L = m L^2 \frac{d\theta^2}{t^2} \\
 \frac{d\theta^2}{t^2} = -\frac{g}{L} \cdot sin(\theta)
-\end{aligned}
+\end{laligned}
 ```
 This second order differential equation is nonlinear due to the sine function. However, for small angles, sin(θ) can be approximated to θ, simplifying the equation to:
 ```math
@@ -128,16 +132,15 @@ We linearize the plant to get the state-space form so we can design a linearized
 ```
 where x is the state vector ($\begin{matrix} \omega \\ \theta \end{matrix}$), and 
 ```math
-\begin{aligned}
-\centering
+\begin{laligned}
 A = \begin{matrix}
 0 & -\frac{g}{L}\\
 1 & 0  \\
 B =  \begin{matrix}
 \frac{1}{m \cdot L^2}\\
-0\\
+0
 \end{matrix}
-\end{aligned}
+\end{laligned}
 ```
 
 ## Control: Linear Quadratic Regulator (LQR)
