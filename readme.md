@@ -99,6 +99,7 @@ The angle that the pendulum makes with the vertical direction is denoted as θ. 
 The equation of motion is:
 ```math
 \begin{aligned}
+\centering
 \tau = I \alpha\\
 - m \cdot g \cdot sin(\theta) L = m L^2 \frac{d\theta^2}{t^2} \\
 \frac{d\theta^2}{t^2} = -\frac{g}{L} \cdot sin(\theta)
@@ -119,8 +120,27 @@ When the pendulum is being controlled, an additional torque term can be introduc
 
 where $\tau$ is the control torque applied at the pivot point.
 
-## Control: Linear Quadratic Regulator (LQR)
+## State-Space Equations
+We linearize the plant to get the state-space form so we can design a linearized controller.
 
+```math
+\dot{x} = A \cdot x + B \cdot \tau
+```
+where x is the state vector ($\begin{matrix} \omega \\ \theta \end{matrix}$), and 
+```math
+\begin{aligned}
+\centering
+A = \begin{matrix}
+0 & -\frac{g}{L}\\
+1 & 0  \\
+B =  \begin{matrix}
+\frac{1}{m \cdot L^2}\\
+0\\
+\end{matrix}
+\end{aligned}
+```
+
+## Control: Linear Quadratic Regulator (LQR)
 The control strategy used in this project is based on the Linear Quadratic Regulator (LQR) approach. LQR is a type of optimal control algorithm that aims to minimize a quadratic cost function of the state and control input. In a simple control problem, the LQR cost function could be written as follows:
 
 ```math
@@ -132,7 +152,7 @@ Where:
 - $u$ is the control input vector
 - $Q$ and $R$ are the weight matrices for the states and control inputs, respectively
 
-By adjusting the elements in $Q$ and $R$, we can tune the performance of our controller. The values chosen for this project are $Q = [30.0, 30.0]$ and $R = [0.01]$. These values are empirical and are chosen to achieve good pendulum balancing performance in the simulator.
+By adjusting the elements in $Q$ and $R$, we can tune the performance of our controller. The values chosen for this project are $Q = [1, 500.0]$ and $R = [0.001]$ ($Q(1,1)$ is related to how much we penalize the $omega$ error and $Q(2,2)$ is how much we penalize the error on the $\theta$. R is how much we penalize actuator effort ($\tau$)). These values are empirical and are chosen to achieve good pendulum balancing performance in the simulator.
 
 LQR operates by solving the Algebraic Riccati Equation (ARE) and obtaining a state feedback law.
 
@@ -146,7 +166,7 @@ PA + A^TP - PBR^{-1}B^TP + Q = 0
 
 Where $P$ is the solution to the ARE. Once the ARE is solved for $P$, the optimal feedback gain $K$ is given by $K = R^{-1}B^TP$. This gain matrix $K$ is then used in the control law $u = -Kx$.
 
-There are several numerical methods to solve the ARE, such as the Schur method, the Newton method, and the eigenvalue method. Some software packages, like MATLAB, offer built-in functions to solve the ARE. It's not necessary to solve the ARE by hand or write your own solver for the ARE. Control libraries and software (like MATLAB's Control System Toolbox or Python's control library) provide functions to solve the ARE and compute the LQR gains. 
+There are several numerical methods to solve the ARE, such as the Schur method, the Newton method, and the eigenvalue method. Some software packages, like MATLAB, offer built-in functions to solve the ARE. It's not necessary to solve the ARE by hand or write your own solver for the ARE. Control libraries and software (like MATLAB's Control System Toolbox or Python's control library) provide functions to solve the ARE and compute the LQR gains.
 
 It's important to note that the ARE only has a unique positive semi-definite solution if certain conditions on the matrices $A$, $B$, $Q$, and $R$ are met, such as $A$ being stable, $Q$ being positive semi-definite, and $R$ being positive definite. These conditions ensure that the optimal control problem posed by the LQR formulation is well-posed and has a solution.
 
