@@ -50,13 +50,13 @@ The project structure is as follows:
 - `msg`: This folder contains custom message `PendulumState.msg` which is used to communicate between the simulator and the controller
 - `include`: This folder includes all the header-only libraries (empty)!
 
+## Node and topics graphs
+
+![Nodes and topics graph](results/rosgraph.png)
+
 ## Configuration
 
 The configuration of the pendulum simulator and controller is done through a YAML file. This provides an easy way to tune parameters without changing the source code.
-
-### Node and topics graphs
-
-![Nodes and topics graph](results/rosgraph.png)
 
 ### Pendulum Simulator Configuration
 
@@ -105,21 +105,21 @@ The equation of motion is:
 ```math
 \begin{aligned}
 \tau = I \alpha\\
-- m \cdot g \cdot sin(\theta) L = m L^2 \frac{d\theta^2}{t^2} \\
-\frac{d\theta^2}{t^2} = -\frac{g}{L} \cdot sin(\theta)
+- m \cdot g \cdot sin(\theta) L = m L^2 \frac{d\theta^2}{dt^2} \\
+\frac{d\theta^2}{dt^2} = -\frac{g}{L} \cdot sin(\theta)
 \end{aligned}
 ```
 This second order differential equation is nonlinear due to the sine function. However, for small angles, sin(θ) can be approximated to θ, simplifying the equation to:
 ```math
-\frac{d^2\theta}{t^2} = -\frac{g}{L} \cdot \theta
+\frac{d^2\theta}{dt^2} = -\frac{g}{L} \cdot \theta
 ```
 This is a simple harmonic motion equation.
-The pendulum's angular velocity ($\omega = \frac{\theta}{t}$) and angular acceleration ($\alpha = \frac{d^2\theta}{t^2}$) can be updated over time using numerical integration methods such as Euler's method or the 4th order Runge-Kutta method, depending on the `integrator` parameter.
+The pendulum's angular velocity ($\omega = \frac{d\theta}{dt}$) and angular acceleration ($\alpha = \frac{d^2\theta}{dt^2}$) can be updated over time using numerical integration methods such as Euler's method or the 4th order Runge-Kutta method, depending on the `integrator` parameter.
 
 When the pendulum is being controlled, an additional torque term can be introduced to the equation of motion to simulate a controlled pendulum. The controlled equation of motion is:
 
 ```math
-\frac{d\theta^2}{t^2} = - \frac{g}{L} \cdot sin(\theta) + \frac{\tau}{m \cdot L^2}
+\frac{d\theta^2}{dt^2} = - \frac{g}{L} \cdot sin(\theta) + \frac{\tau}{m \cdot L^2}
 ```
 
 where $\tau$ is the control torque applied at the pivot point.
@@ -133,7 +133,7 @@ We linearize the plant to get the state-space form so we can design a linearized
 where x is the state vector:
 ```math
 \begin{equation}
-\begin{bmatrix} 
+x = \begin{bmatrix} 
 \omega \\
 \theta
 \end{bmatrix}
@@ -143,10 +143,10 @@ And
 
 ```math
 \begin{aligned}
-A = \begin{matrix}
+A = \begin{pmatrix}
 0 & -\frac{g}{L}\\
 1 & 0
-\end{matrix}
+\end{pmatrix}\\
 B =  \begin{bmatrix}
 \frac{1}{m \cdot L^2}\\
 0
