@@ -190,7 +190,8 @@ $K_{\omega}$ = 48.9360
 integrator: RK4
 controller output time period: 10ms
 ### Free-fall case (No controller):
-[![Watch the video](https://imgur.com/a/1fIY7iC)]([https://youtu.be/vt5fpE0bzSY](https://youtu.be/N4ZwnxJj3JI))
+
+[![Watch the video](https://imgur.com/a/1fIY7iC)](https://youtu.be/N4ZwnxJj3JI)
 
 ### Controlled case:
 
