@@ -190,7 +190,7 @@ $K_{\omega}$ = 48.9360
 integrator: RK4
 controller output time period: 10ms
 ### Free-fall case (No controller):
-[free-fall.webm](https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/59e4bd36-78b0-4260-87ed-9f90c7f1c797)
+[![Watch the video](https://imgur.com/a/1fIY7iC)]([https://youtu.be/vt5fpE0bzSY](https://youtu.be/N4ZwnxJj3JI))
 
 ### Controlled case:
 
