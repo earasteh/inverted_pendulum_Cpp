@@ -184,6 +184,17 @@ There are several numerical methods to solve the ARE, such as the Schur method, 
 
 It's important to note that the ARE only has a unique positive semi-definite solution if certain conditions on the matrices $A$, $B$, $Q$, and $R$ are met, such as $A$ being stable, $Q$ being positive semi-definite, and $R$ being positive definite. These conditions ensure that the optimal control problem posed by the LQR formulation is well-posed and has a solution.
 
+### Perturbation
+When the perturbed case is chosen, a stochastic perturbation is added to the torque input of the system. The probability density function (pdf) for this distribution is given by:
+
+```math
+\begin{equation}
+f(\tilde{\tau}) = \frac{1}{\sigma \sqrt{2\pi}} e^{ -\frac{(\tilde{\tau}-\mu)^2}{2\sigma^2}}
+\end{equation}
+```
+where $\mu$ is mean and $\sigma$ is standard deviation and they are both chosen to be 5 N.m.
+
+
 ## Results
 $K_{\theta}$ = 697.3648
 $K_{\omega}$ = 48.9360
@@ -198,8 +209,7 @@ controller output time period: 10ms
 [Controlled video](https://youtu.be/_-tOt52oRbw)
 
 ### Perturbed case:
-[[perturb.webm](Perturbed case)
-](https://youtu.be/vbbbI5J1vL0)
+[Perturbed case](https://youtu.be/vbbbI5J1vL0)
 
 
 And here are the plots of $\theta$ (rad), $\omega$ (rad/sec) , and $\tau$ (N.m).
