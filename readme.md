@@ -191,19 +191,20 @@ integrator: RK4
 controller output time period: 10ms
 ### Free-fall case (No controller):
 
-[![Watch the video](https://imgur.com/a/1fIY7iC)](https://youtu.be/N4ZwnxJj3JI)
+[![Free-fall](https://imgur.com/a/1fIY7iC)](https://youtu.be/N4ZwnxJj3JI)
 
 ### Controlled case:
 
-[https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/728afa6e-0006-4f37-a584-eb8e55c9ee53
-](https://youtu.be/_-tOt52oRbw)
+[Controlled video](https://youtu.be/_-tOt52oRbw)
 
-### Purterbed case:
-[[perturb.webm](https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/728610c8-6ef5-4bb3-9d98-f256c231cb95)
+### Perturbed case:
+[[perturb.webm](Perturbed case)
 ](https://youtu.be/vbbbI5J1vL0)
+
+
 And here are the plots of $\theta$ (rad), $\omega$ (rad/sec) , and $\tau$ (N.m).
 
-![Nodes and topics graph](results/perturbed.png)
+![Results of stochastic Perturbation](results/perturbed.png)
 
 
 
