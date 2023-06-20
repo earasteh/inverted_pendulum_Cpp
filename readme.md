@@ -132,19 +132,25 @@ We linearize the plant to get the state-space form so we can design a linearized
 ```
 where x is the state vector:
 ```math
-\begin{matrix} \omega \\ \theta \end{matrix}$
+\begin{equation}
+\begin{bmatrix} 
+\omega \\
+\theta
+\end{bmatrix}
+\end{equation}
 ```
-, and 
+And
 
 ```math
 \begin{aligned}
 A = \begin{matrix}
 0 & -\frac{g}{L}\\
-1 & 0  \\
-B =  \begin{matrix}
+1 & 0
+\end{matrix}
+B =  \begin{bmatrix}
 \frac{1}{m \cdot L^2}\\
 0
-\end{matrix}
+\end{bmatrix}
 \end{aligned}
 ```
 
