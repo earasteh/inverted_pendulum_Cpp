@@ -195,12 +195,12 @@ controller output time period: 10ms
 
 ### Controlled case:
 
-https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/728afa6e-0006-4f37-a584-eb8e55c9ee53
+[https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/728afa6e-0006-4f37-a584-eb8e55c9ee53
+](https://youtu.be/_-tOt52oRbw)
 
 ### Purterbed case:
-
-[perturb.webm](https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/728610c8-6ef5-4bb3-9d98-f256c231cb95)
-
+[[perturb.webm](https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/728610c8-6ef5-4bb3-9d98-f256c231cb95)
+](https://youtu.be/vbbbI5J1vL0)
 And here are the plots of $\theta$ (rad), $\omega$ (rad/sec) , and $\tau$ (N.m).
 
 ![Nodes and topics graph](results/perturbed.png)
