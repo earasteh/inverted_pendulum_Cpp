@@ -103,11 +103,11 @@ The equations of motion for a simple pendulum under the influence of gravity are
 The angle that the pendulum makes with the vertical direction is denoted as θ. Positive θ corresponds to counterclockwise rotation from the vertical. We assume that the pendulum rod is massless and that all the mass is concentrated at the end of the rod.
 The equation of motion is:
 ```math
-\begin{laligned}
+\begin{aligned}
 \tau = I \alpha\\
 - m \cdot g \cdot sin(\theta) L = m L^2 \frac{d\theta^2}{t^2} \\
 \frac{d\theta^2}{t^2} = -\frac{g}{L} \cdot sin(\theta)
-\end{laligned}
+\end{aligned}
 ```
 This second order differential equation is nonlinear due to the sine function. However, for small angles, sin(θ) can be approximated to θ, simplifying the equation to:
 ```math
@@ -130,9 +130,14 @@ We linearize the plant to get the state-space form so we can design a linearized
 ```math
 \dot{x} = A \cdot x + B \cdot \tau
 ```
-where x is the state vector ($\begin{matrix} \omega \\ \theta \end{matrix}$), and 
+where x is the state vector:
 ```math
-\begin{laligned}
+\begin{matrix} \omega \\ \theta \end{matrix}$
+```
+, and 
+
+```math
+\begin{aligned}
 A = \begin{matrix}
 0 & -\frac{g}{L}\\
 1 & 0  \\
@@ -140,7 +145,7 @@ B =  \begin{matrix}
 \frac{1}{m \cdot L^2}\\
 0
 \end{matrix}
-\end{laligned}
+\end{aligned}
 ```
 
 ## Control: Linear Quadratic Regulator (LQR)
@@ -188,5 +193,10 @@ https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/728afa6e-0006-
 ### Purterbed case:
 
 [perturb.webm](https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/728610c8-6ef5-4bb3-9d98-f256c231cb95)
+
+And here are the plots of $\theta$ (rad), $\omega$ (rad/sec) , and $\tau$ (N.m).
+
+![Nodes and topics graph](results/perturbed.png)
+
 
 
