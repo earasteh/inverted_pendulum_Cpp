@@ -216,5 +216,14 @@ And here are the plots of $\theta$ (rad), $\omega$ (rad/sec) , and $\tau$ (N.m).
 
 ![Results of stochastic Perturbation](results/perturbed.png)
 
-
-
+### Future ideas
+Some ideas to implement in the future for this toy example:
+Actuator:
+- Set a limiting torque for the actuator and a slew rate or bandwidth for the actuator (create an actuator model)
+- Add friction model on the pivot point to make the system nonlinear
+Sensor:
+- Create a sensor noise added to the pendulum angle and angular velocity (can also only send angle and not both)
+- Create a Kalman filter or complementary filter to estimate the angular velocity based on the angle only (or maybe some other sensors?)
+Controller:
+- Add an anti-windup and hard limit on the amount of torque being sent to the model
+- Investigate other control methods
