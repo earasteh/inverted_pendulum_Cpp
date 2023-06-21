@@ -4,7 +4,11 @@ pendulum_simulator:
         g: 9.81
         L: 1.0
         integrator: "RK4"
-        sim_mode: "perturb"
+        sim_mode: "step"
+        step_amp: 10000.0
+        step_duration: 4.00
+        step_start: 20.00
+        impulse_amp: 10000.00
 pendulum_controller:
     ros__parameters:
         K_theta: 697.3648

@@ -26,12 +26,23 @@ public:
         this->declare_parameter<double>("L", 1.0);
         this->declare_parameter<std::string>("integrator", "Euler");
         this->declare_parameter<std::string>("sim_mode", "free-fall");
+        this->declare_parameter<double>("step_amp", 1000.0);
+        this->declare_parameter<double>("step_duration", 4.00);
+        this->declare_parameter<double>("step_start", 20.00);
+        this->declare_parameter<double>("impulse_amp", 10000);
+
         
         m = this->get_parameter("m").as_double();
         g = this->get_parameter("g").as_double();
         L = this->get_parameter("L").as_double();
         sim_mode = this->get_parameter("sim_mode").as_string();
         integrator_type = this->get_parameter("integrator").as_string();
+        // step data
+        step_amp = this->get_parameter("step_amp").as_double();
+        step_duration = this->get_parameter("step_duration").as_double();
+        step_start = this->get_parameter("step_start").as_double();
+        // impulse data
+        impulse_amp = this->get_parameter("impulse_amp").as_double();
 
         // Initialize the random number generator with current time as seed
         std::random_device rd;
@@ -97,9 +108,11 @@ private:
         
         // calculate dt
         auto current_time = this->get_clock()->now();
+
         auto dt = (current_time - last_time_).seconds(); // actual time since last call in seconds
         last_time_ = current_time;
-        
+
+        std::cout << "Time: " << (current_time - start_time_).seconds() << std::endl;
         
         // tf broadcaster (just broadcast a basic coordiantes)
         geometry_msgs::msg::TransformStamped transformStamped;
@@ -126,6 +139,18 @@ private:
         else if(sim_mode == "perturb"){
             //perturbation being added to the controlled torque
             torque += generate_perturbation();
+        }
+        else if(sim_mode == "impulse"){
+            if((current_time - start_time_).seconds() >= step_start && (current_time - start_time_).seconds() <= step_start + 0.002){
+                std::cout << "********************************IMPLSE**********************************" << std::endl;
+                torque += impulse_amp;
+            }
+        }
+        else if(sim_mode == "step"){
+            if((current_time - start_time_).seconds() >= step_start && (current_time - start_time_).seconds() <= step_start+step_duration){
+                std::cout << "********************************STEP**********************************" << std::endl;
+                torque += step_amp;
+            }
         }
         else{
             // controlled torque
@@ -204,7 +229,7 @@ void control_output_callback(const geometry_msgs::msg::Wrench::SharedPtr msg)
     rclcpp::Time now = this->now();
     double t_ = (now - start_time_).seconds();
     /////////
-    std::cout << "Callback Timer: " << t_ << std::endl;
+    //std::cout << "Callback Timer: " << t_ << std::endl;
 
     
     if(sim_mode != "free-fall"){
@@ -252,6 +277,7 @@ double generate_perturbation() {
     double current_angle_;
     double current_angular_velocity_;
     double torque;
+    double step_amp, step_duration, step_start, impulse_amp;
 };
 
 int main(int argc, char ** argv)
