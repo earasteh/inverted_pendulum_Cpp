@@ -184,25 +184,37 @@ There are several numerical methods to solve the ARE, such as the Schur method, 
 
 It's important to note that the ARE only has a unique positive semi-definite solution if certain conditions on the matrices $A$, $B$, $Q$, and $R$ are met, such as $A$ being stable, $Q$ being positive semi-definite, and $R$ being positive definite. These conditions ensure that the optimal control problem posed by the LQR formulation is well-posed and has a solution.
 
+### Perturbation
+When the perturbed case is chosen, a stochastic perturbation is added to the torque input of the system. The probability density function (pdf) for this distribution is given by:
+
+```math
+\begin{equation}
+f(\tilde{\tau}) = \frac{1}{\sigma \sqrt{2\pi}} e^{ -\frac{(\tilde{\tau}-\mu)^2}{2\sigma^2}}
+\end{equation}
+```
+where $\mu$ is mean and $\sigma$ is standard deviation and they are both chosen to be 5 N.m.
+
+
 ## Results
 $K_{\theta}$ = 697.3648
 $K_{\omega}$ = 48.9360
 integrator: RK4
 controller output time period: 10ms
 ### Free-fall case (No controller):
-[free-fall.webm](https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/59e4bd36-78b0-4260-87ed-9f90c7f1c797)
+
+[![Free-fall](https://imgur.com/a/1fIY7iC)](https://youtu.be/N4ZwnxJj3JI)
 
 ### Controlled case:
 
-https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/728afa6e-0006-4f37-a584-eb8e55c9ee53
+[Controlled video](https://youtu.be/_-tOt52oRbw)
 
-### Purterbed case:
+### Perturbed case:
+[Perturbed case](https://youtu.be/vbbbI5J1vL0)
 
-[perturb.webm](https://github.com/earasteh/inverted_pendulum_Cpp/assets/33266143/728610c8-6ef5-4bb3-9d98-f256c231cb95)
 
 And here are the plots of $\theta$ (rad), $\omega$ (rad/sec) , and $\tau$ (N.m).
 
-![Nodes and topics graph](results/perturbed.png)
+![Results of stochastic Perturbation](results/perturbed.png)
 
 
 
