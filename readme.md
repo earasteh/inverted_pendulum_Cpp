@@ -66,7 +66,10 @@ The pendulum simulator's configuration includes parameters such as mass (`m`), g
 - `g`: The acceleration due to gravity.
 - `L`: The length of the pendulum.
 - `integrator`: The type of numerical integration to use for the simulation. Choices are "Euler" for Euler's method, or "RK4" for the 4th order Runge-Kutta method.
-- `sim_mode`: The simulation mode. "free-fall" for uncontrolled simulation where the pendulum is free to swing, "controlled" where the pendulum controller is active and "perturb" where there is active control but perturbation is added to torque input.
+- `sim_mode`: The simulation mode. "free-fall" for uncontrolled simulation where the pendulum is free to swing, "controlled" where the pendulum controller is active, and "perturb" where there is active control but perturbation is added to torque input. "step" and "impulse" mode are when a step/impulse is added as a perturbation.
+- `step_amp`: Amplitude of step disturbance when on `step` mode (N.m)
+- `step_duraton`: Duration of step disturbance (sec)
+- `step_start`: Start time of disturbance (sec)
 
 Example configuration:
 
